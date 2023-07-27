@@ -81,6 +81,25 @@ services:
         condition: service_healthy
       kafka:
         condition: service_healthy
+  wallet:
+    container_name: wallet-service
+    build:
+      context: ./wallet
+    restart: on-failure
+    env_file:
+      - .wallet-env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/wallet_db
+      - USER_SERVICE_URL=user:8081
+    ports:
+      - "8080:8080"
+    networks:
+      - wallet-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
   zookeeper:
     container_name: zookeeper
     networks:
