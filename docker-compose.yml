@@ -1,0 +1,108 @@
+version: "3.8"
+services:
+  kafka:
+    container_name: kafka
+    healthcheck:
+      test: [ "CMD", "kafka-topics", "--list", "--bootstrap-server", "kafka:9092" ]
+      start_period: 30s
+      interval: 10s
+      timeout: 60s
+      retries: 5
+    platform: linux/amd64
+    image: confluentinc/cp-kafka:7.1.2
+    depends_on:
+      - zookeeper
+    networks:
+      - wallet-net
+    ports:
+      - "9092:9092"
+    expose:
+      - 29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+  init-kafka:
+    container_name: init-kafka
+    image: confluentinc/cp-kafka:7.1.2
+    depends_on:
+      kafka:
+        condition: service_healthy
+    networks:
+      - wallet-net
+    entrypoint: [ '/bin/sh', '-c' ]
+    command: |
+      "
+      # blocks until kafka is reachable
+      kafka-topics --bootstrap-server kafka:29092 --list
+
+      echo -e 'Creating kafka topics'
+      kafka-topics --bootstrap-server kafka:29092 --create --if-not-exists --topic credit --replication-factor 1 --partitions 1
+
+      echo -e 'Successfully created the following topics:'
+      kafka-topics --bootstrap-server kafka:29092 --list
+      "
+  postgres:
+    container_name: postgres
+    image: postgres:14
+    restart: always
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
+    networks:
+      - wallet-net
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  user:
+    container_name: user-service
+    build:
+      context: ./user
+    restart: on-failure
+    env_file:
+      - .user-env
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/user_db
+    ports:
+      - "8081:8081"
+    networks:
+      - wallet-net
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+  zookeeper:
+    container_name: zookeeper
+    networks:
+      - wallet-net
+    platform: linux/amd64
+    image: confluentinc/cp-zookeeper:7.1.2
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  pgadmin-compose:
+    container_name: pgadmin
+    image: dpage/pgadmin4:6.13
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "joao@wallet.com"
+      PGADMIN_DEFAULT_PASSWORD: "wallet"
+    ports:
+      - "16580:80"
+    networks:
+      - wallet-net
+volumes:
+  postgres:
+networks:
+  wallet-net:
+    name: wallet-net
+    driver: bridge
