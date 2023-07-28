@@ -1,6 +1,6 @@
 package com.challenge.wallet.controller;
 
-import com.challenge.wallet.dto.DepositTransactionRequest;
+import com.challenge.wallet.dto.WalletCreateRequest;
 import com.challenge.wallet.service.WalletService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/wallets")
@@ -19,13 +21,9 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity deposit(@RequestBody DepositTransactionRequest transactionRequest) {
-        try {
-            walletService.deposit(transactionRequest);
+    public ResponseEntity create(@RequestBody @Valid WalletCreateRequest walletCreateRequest) {
+        walletService.createWallet(walletCreateRequest);
 
-            return new ResponseEntity(HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity(HttpStatus.BAD_REQUEST);
-        }
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }

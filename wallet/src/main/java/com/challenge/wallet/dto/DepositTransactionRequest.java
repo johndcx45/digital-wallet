@@ -13,4 +13,5 @@ import java.util.UUID;
 public class DepositTransactionRequest {
     private Double amount;
     private UUID walletId;
+    private UUID userId;
 }

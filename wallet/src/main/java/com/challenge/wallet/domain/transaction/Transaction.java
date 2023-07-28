@@ -1,28 +1,41 @@
 package com.challenge.wallet.domain.transaction;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.challenge.wallet.domain.wallet.Wallet;
+import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name = "transactionType", discriminatorType = DiscriminatorType.STRING)
 @Table(name = "transaction_tb")
-public abstract class Transaction {
+public class Transaction {
     @Id
     @GeneratedValue
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    private UUID id;
-    protected abstract TransactionType transactionType();
-    private LocalDateTime timestamp;
+    private UUID transactionId;
+    @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
+    private Date timestamp;
+    private Double amount;
+    @ManyToOne
+    @JoinColumn(name = "wallet_id", nullable = false)
+    private Wallet wallet;
+    @OneToOne
+    @JoinColumn(name = "target_wallet_id", referencedColumnName = "wallet_id")
+    private Wallet targetWallet;
+    @Column(name = "bill_value")
+    private BigDecimal billValue;
+    @Column(name = "transaction_type")
+    @Enumerated(EnumType.STRING)
+    private TransactionType transactionType;
 }

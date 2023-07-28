@@ -1,7 +1,7 @@
 package com.challenge.user.controller;
 
 import com.challenge.user.domain.User;
-import com.challenge.user.dto.UserCreateRequest;
+import com.challenge.user.dto.CreateUserRequest;
 import com.challenge.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -46,8 +46,8 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody @Valid UserCreateRequest userCreateRequest) {
-        userService.createUser(userCreateRequest);
+    public ResponseEntity create(@RequestBody @Valid CreateUserRequest createUserRequest) {
+        userService.createUser(createUserRequest);
 
         return new ResponseEntity(HttpStatus.CREATED);
     }
