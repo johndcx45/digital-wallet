@@ -1,8 +1,8 @@
 package com.challenge.wallet.service;
 
 import com.challenge.wallet.client.UserClient;
+import com.challenge.wallet.dto.wallet.UserResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,9 @@ public class UserService {
     }
 
     public boolean isUserValid(UUID userId) {
-        ResponseEntity<User> response = userClient.isUserValid(userId);
+        log.info("Processing whether the user is valid.");
+        ResponseEntity<UserResponse> response = userClient.getById(userId);
+
         log.info("HttpStatus of the user validation request: {}, hasBody: {}", response.getStatusCode(), response.hasBody());
 
         if(response.getStatusCode().equals(HttpStatus.NOT_FOUND)) {

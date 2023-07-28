@@ -1,4 +1,4 @@
-package com.challenge.wallet.dto;
+package com.challenge.wallet.dto.wallet;
 
 import lombok.*;
 

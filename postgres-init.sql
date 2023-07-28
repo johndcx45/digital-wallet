@@ -14,14 +14,14 @@ CREATE TABLE IF NOT EXISTS public.user_tb
 (
     user_id uuid NOT NULL,
     created_at date,
-    first_name character varying(20) COLLATE pg_catalog."default" NOT NULL,
-    last_name character varying(20) COLLATE pg_catalog."default" NOT NULL,
-    social_security_number character varying(11) COLLATE pg_catalog."default",
-    username character varying(25) COLLATE pg_catalog."default" NOT NULL,
+    first_name text COLLATE pg_catalog."default" NOT NULL,
+    last_name text COLLATE pg_catalog."default" NOT NULL,
+    social_security_number text COLLATE pg_catalog."default",
+    username text COLLATE pg_catalog."default" NOT NULL,
     wallet_id uuid,
     CONSTRAINT user_tb_pkey PRIMARY KEY (user_id),
     CONSTRAINT uk_lvx22t2upvjxxc86vf5daxc71 UNIQUE (username)
-)
+);
 
 \c wallet_db;
 CREATE TABLE IF NOT EXISTS public.wallet_tb (
@@ -29,15 +29,15 @@ CREATE TABLE IF NOT EXISTS public.wallet_tb (
     balance numeric(19,2),
     user_id uuid,
     CONSTRAINT wallet_tb_pkey PRIMARY KEY (wallet_id)
-)
+);
 
 \c wallet_db;
 CREATE TABLE IF NOT EXISTS public.transaction_tb (
     transaction_id uuid NOT NULL,
     amount numeric(19,2),
     bill_value numeric(19,2),
-    "timestamp" date without time zone,
-    transaction_type character varying(255) COLLATE pg_catalog."default",
+    "timestamp" date,
+    transaction_type text COLLATE pg_catalog."default",
     target_wallet_id uuid,
     wallet_id uuid NOT NULL,
     CONSTRAINT transaction_tb_pkey PRIMARY KEY (transaction_id),
@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS public.transaction_tb (
         REFERENCES public.wallet_tb (wallet_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
+);
 
 \c user_db;
 INSERT INTO public.user_tb(user_id, created_at, first_name, last_name, social_security_number, username)

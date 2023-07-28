@@ -1,19 +1,21 @@
 package com.challenge.wallet.service;
 
 import com.challenge.wallet.domain.wallet.Wallet;
-import com.challenge.wallet.dto.WalletCreateRequest;
-import com.challenge.wallet.dto.WalletCreatedResponse;
+import com.challenge.wallet.dto.wallet.WalletCreateRequest;
+import com.challenge.wallet.dto.wallet.WalletCreatedResponse;
 import com.challenge.wallet.mapper.WalletMapper;
 import com.challenge.wallet.repository.WalletRepository;
 import com.challenge.wallet.util.Constants;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -33,11 +35,14 @@ public class WalletService {
 
     public void createWallet(WalletCreateRequest walletCreateRequest) {
         try {
-            Wallet wallet = walletMapper.walletCreateRequestToWallet(walletCreateRequest);
+            if(walletRepository.findByUserId(UUID.fromString(walletCreateRequest.getUserId())).isPresent()) {
+                log.error("A wallet already exists for given user: {}", walletCreateRequest.getUserId());
+                throw new RuntimeException("Could not create a wallet.");
+            }
 
-            Wallet.builder()
+            Wallet wallet  = Wallet.builder()
+                    .userId(UUID.fromString(walletCreateRequest.getUserId()))
                     .balance(0.0)
-                    .walletId(UUID.randomUUID())
                     .transactions(new ArrayList<>())
                     .build();
 
@@ -50,7 +55,17 @@ public class WalletService {
 
             kafkaTemplate.send(Constants.WALLET_CREATED_TOPIC, objectMapper.writeValueAsString(walletCreatedResponse));
         } catch (Exception e) {
-            log.error("Error in processing the response.");
+            log.error("Error in processing the response. {}", e);
         }
+    }
+
+    public List<Wallet> findWithPagination(Integer page, Integer size) {
+        Page<Wallet> wallets = walletRepository.findAll(PageRequest.of(page, size));
+
+        if(wallets.getTotalElements() == 0) {
+            return null;
+        }
+
+        return wallets.getContent();
     }
 }

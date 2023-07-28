@@ -2,11 +2,9 @@ package com.challenge.user.service;
 
 import com.challenge.user.domain.User;
 import com.challenge.user.dto.CreateUserRequest;
-import com.challenge.user.dto.CreateWalletRequest;
 import com.challenge.user.dto.WalletCreatedResponse;
 import com.challenge.user.mapper.UserMapper;
 import com.challenge.user.repository.UserRepository;
-import com.challenge.user.util.Constants;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +16,6 @@ import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -49,14 +46,8 @@ public class UserService {
         return users.getContent();
     }
 
-    public User findById(UUID id) {
-        Optional<User> optional = userRepository.findById(id);
-
-        if(optional.isEmpty()) {
-            return null;
-        }
-
-        return optional.get();
+    public Optional<User> findById(UUID id) {
+        return userRepository.findById(id);
     }
 
     public void createUser(CreateUserRequest createUserRequest) {
@@ -75,16 +66,22 @@ public class UserService {
     }
 
 
-    @KafkaListener(topics = "${WALLET_CREATED_TOPIC}", groupId = "wallet")
+    @KafkaListener(topics = "wallet-created-topic", groupId = "wallet")
     public void assignWalletIdToRespectiveUser(String walletCreatedResponseMessage) {
         try {
             WalletCreatedResponse walletCreatedResponse = objectMapper.readValue(walletCreatedResponseMessage,
                     WalletCreatedResponse.class);
 
-            User user = findById(UUID.fromString(walletCreatedResponse.getUserId()));
+            Optional<User> optional = findById(UUID.fromString(walletCreatedResponse.getUserId()));
 
-            if (user == null) {
+            if (optional.isEmpty()) {
                 throw new RuntimeException("There is not user with the given id: {}" + walletCreatedResponse.getUserId());
+            }
+
+            User user = optional.get();
+
+            if(user.getWalletId() != null) {
+                throw new RuntimeException("Given user has already a wallet.");
             }
 
             user.setWalletId(UUID.fromString(walletCreatedResponse.getWalletId()));

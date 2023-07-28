@@ -1,4 +1,4 @@
-package com.challenge.wallet.dto;
+package com.challenge.wallet.dto.transaction;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,8 +10,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-public class DepositTransactionRequest {
+public class TransferTransactionRequest {
+    private UUID sourceWallet;
+    private UUID targetWallet;
     private Double amount;
-    private UUID walletId;
-    private UUID userId;
 }

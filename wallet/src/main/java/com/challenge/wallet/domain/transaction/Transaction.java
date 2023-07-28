@@ -27,9 +27,8 @@ public class Transaction {
     @DateTimeFormat(pattern = "dd/MM/yyyy HH:mm")
     private Date timestamp;
     private Double amount;
-    @ManyToOne
-    @JoinColumn(name = "wallet_id", nullable = false)
-    private Wallet wallet;
+    @Column(name = "wallet_id")
+    private UUID walletId;
     @OneToOne
     @JoinColumn(name = "target_wallet_id", referencedColumnName = "wallet_id")
     private Wallet targetWallet;
