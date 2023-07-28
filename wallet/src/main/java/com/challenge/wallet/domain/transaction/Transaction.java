@@ -29,11 +29,8 @@ public class Transaction {
     private Double amount;
     @Column(name = "wallet_id")
     private UUID walletId;
-    @OneToOne
-    @JoinColumn(name = "target_wallet_id", referencedColumnName = "wallet_id")
-    private Wallet targetWallet;
-    @Column(name = "bill_value")
-    private BigDecimal billValue;
+    @Column(name = "target_wallet")
+    private UUID targetWallet;
     @Column(name = "transaction_type")
     @Enumerated(EnumType.STRING)
     private TransactionType transactionType;

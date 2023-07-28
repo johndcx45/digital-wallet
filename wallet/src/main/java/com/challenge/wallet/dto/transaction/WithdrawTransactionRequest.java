@@ -9,8 +9,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-public class TransferTransactionRequest {
+public class WithdrawTransactionRequest {
     private UUID sourceWallet;
-    private UUID targetWallet;
     private Double amount;
 }
