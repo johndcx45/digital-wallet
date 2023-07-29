@@ -47,10 +47,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody @Valid CreateUserRequest createUserRequest) {
-        userService.createUser(createUserRequest);
+    public ResponseEntity<User> create(@RequestBody @Valid CreateUserRequest createUserRequest) {
+        User user = userService.createUser(createUserRequest);
 
-        return new ResponseEntity(HttpStatus.CREATED);
+        if(user == null) {
+            return new ResponseEntity(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity(user, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
