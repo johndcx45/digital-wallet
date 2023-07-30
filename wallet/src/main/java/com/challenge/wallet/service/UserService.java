@@ -2,6 +2,7 @@ package com.challenge.wallet.service;
 
 import com.challenge.wallet.client.UserClient;
 import com.challenge.wallet.dto.wallet.UserResponse;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@NoArgsConstructor
 public class UserService {
     private UserClient userClient;
 

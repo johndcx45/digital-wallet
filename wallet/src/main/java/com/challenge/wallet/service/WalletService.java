@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -33,7 +34,7 @@ public class WalletService {
         this.objectMapper = new ObjectMapper();
     }
 
-    public void createWallet(WalletCreateRequest walletCreateRequest) {
+    public Wallet createWallet(WalletCreateRequest walletCreateRequest) {
         try {
             if(walletRepository.findByUserId(UUID.fromString(walletCreateRequest.getUserId())).isPresent()) {
                 log.error("A wallet already exists for given user: {}", walletCreateRequest.getUserId());
@@ -54,9 +55,13 @@ public class WalletService {
                     .build();
 
             kafkaTemplate.send(Constants.WALLET_CREATED_TOPIC, objectMapper.writeValueAsString(walletCreatedResponse));
+
+            return wallet;
         } catch (Exception e) {
             log.error("Error in processing the response. {}", e);
         }
+
+        return null;
     }
 
     public List<Wallet> findWithPagination(Integer page, Integer size) {
@@ -67,5 +72,19 @@ public class WalletService {
         }
 
         return wallets.getContent();
+    }
+
+    public void deleteById(UUID id) {
+        try {
+            walletRepository.deleteById(id);
+
+            kafkaTemplate.send(Constants.WALLET_DELETED_TOPIC, objectMapper.writeValueAsString(id));
+        } catch(Exception e) {
+            throw new RuntimeException("Wallet with given id does not exist.");
+        }
+    }
+
+    public Optional<Wallet> findById(UUID id) {
+        return walletRepository.findById(id);
     }
 }

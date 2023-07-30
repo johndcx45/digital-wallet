@@ -24,7 +24,8 @@ public class Wallet {
     private UUID walletId;
     @Column(name = "user_id")
     private UUID userId;
-    @OneToMany(targetEntity = Transaction.class, mappedBy = "walletId", fetch = FetchType.EAGER)
+    @OneToMany(targetEntity = Transaction.class, mappedBy = "walletId", fetch = FetchType.EAGER,
+            cascade = CascadeType.REMOVE)
     private List<Transaction> transactions;
     private Double balance;
 }

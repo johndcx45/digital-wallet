@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/wallets")
@@ -21,10 +23,14 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody @Valid WalletCreateRequest walletCreateRequest) {
-        walletService.createWallet(walletCreateRequest);
+    public ResponseEntity<Wallet> create(@RequestBody @Valid WalletCreateRequest walletCreateRequest) {
+        Wallet wallet = walletService.createWallet(walletCreateRequest);
 
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        if(wallet == null) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        return new ResponseEntity<>(wallet, HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -37,5 +43,23 @@ public class WalletController {
         }
 
         return new ResponseEntity<>(wallets, HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Wallet> getById(@PathVariable("id") UUID id) {
+        Optional<Wallet> wallet = walletService.findById(id);
+
+        if(wallet.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(wallet.get(), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity delete(@PathVariable("id") UUID id) {
+        walletService.deleteById(id);
+
+        return new ResponseEntity(HttpStatus.OK);
     }
 }

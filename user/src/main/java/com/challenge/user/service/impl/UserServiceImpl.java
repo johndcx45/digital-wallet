@@ -107,4 +107,19 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("User with given id does not exist!");
         }
     }
+    @KafkaListener(topics = "wallet-deleted-topic", groupId = "wallet")
+    public void deleteWalletFromUser(String message) {
+        try {
+            UUID walletId = objectMapper.readValue(message, UUID.class);
+
+            User user = userRepository.findByWalletId(walletId);
+
+            user.setWalletId(null);
+
+            userRepository.save(user);
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException("Could process the wallet id.");
+        }
+
+    }
 }
