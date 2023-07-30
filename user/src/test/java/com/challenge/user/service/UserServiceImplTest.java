@@ -35,7 +35,7 @@ class UserServiceImplTest {
 
     @BeforeEach
     void setup() {
-        this.userService = new UserServiceImpl(userRepository, kafkaTemplate);
+        userService = new UserServiceImpl(userRepository, kafkaTemplate);
         firstUserId = UUID.fromString("2a409788-1eb0-4ad9-bbc2-b512c25dce2f");
         secondUserId = UUID.fromString("80648b2f-394c-42db-b554-9324a9db9cf7");
 

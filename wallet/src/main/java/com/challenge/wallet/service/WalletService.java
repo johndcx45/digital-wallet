@@ -6,6 +6,7 @@ import com.challenge.wallet.dto.wallet.WalletCreatedResponse;
 import com.challenge.wallet.mapper.WalletMapper;
 import com.challenge.wallet.repository.WalletRepository;
 import com.challenge.wallet.util.Constants;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
@@ -35,36 +36,38 @@ public class WalletService {
     }
 
     public Wallet createWallet(WalletCreateRequest walletCreateRequest) {
+        if(walletRepository.findByUserId(UUID.fromString(walletCreateRequest.getUserId())).isPresent()) {
+            log.error("A wallet already exists for given user: {}", walletCreateRequest.getUserId());
+            throw new RuntimeException("Could not create a wallet.");
+        }
+
+        Wallet newWallet  = Wallet.builder()
+                .userId(UUID.fromString(walletCreateRequest.getUserId()))
+                .balance(0.0)
+                .transactions(new ArrayList<>())
+                .build();
+
+        Wallet wallet = walletRepository.save(newWallet);
+
+        WalletCreatedResponse walletCreatedResponse = WalletCreatedResponse.builder()
+                .walletId(wallet.getWalletId().toString())
+                .userId(wallet.getUserId().toString())
+                .build();
+
         try {
-            if(walletRepository.findByUserId(UUID.fromString(walletCreateRequest.getUserId())).isPresent()) {
-                log.error("A wallet already exists for given user: {}", walletCreateRequest.getUserId());
-                throw new RuntimeException("Could not create a wallet.");
-            }
-
-            Wallet wallet  = Wallet.builder()
-                    .userId(UUID.fromString(walletCreateRequest.getUserId()))
-                    .balance(0.0)
-                    .transactions(new ArrayList<>())
-                    .build();
-
-            walletRepository.save(wallet);
-
-            WalletCreatedResponse walletCreatedResponse = WalletCreatedResponse.builder()
-                    .walletId(wallet.getWalletId().toString())
-                    .userId(wallet.getUserId().toString())
-                    .build();
-
             kafkaTemplate.send(Constants.WALLET_CREATED_TOPIC, objectMapper.writeValueAsString(walletCreatedResponse));
 
             return wallet;
-        } catch (Exception e) {
-            log.error("Error in processing the response. {}", e);
+        } catch (JsonProcessingException e) {
+            log.error("Error in sending the message for message broker.");
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     public List<Wallet> findWithPagination(Integer page, Integer size) {
+        if(page < 0 || size <= 0) {
+            throw new RuntimeException("One of the parameters, page or size, is invalid.");
+        }
         Page<Wallet> wallets = walletRepository.findAll(PageRequest.of(page, size));
 
         if(wallets.getTotalElements() == 0) {
