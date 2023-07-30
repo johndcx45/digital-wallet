@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.util.UUID;
 
-@FeignClient(name = "user", url = "http://localhost:8081")
+@FeignClient(value = "user", url = "http://host.docker.internal:8081/users")
 public interface UserClient {
-    @RequestMapping(method = RequestMethod.GET, value = "/users/{id}")
+    @RequestMapping(method = RequestMethod.GET, value = "/{id}")
     ResponseEntity<UserResponse> getById(@PathVariable("id") UUID id);
 }

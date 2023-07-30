@@ -65,9 +65,9 @@ public class TransactionService {
         walletRepository.save(wallet);
     }
 
-    public void transfer(TransferTransactionRequest transactionRequest) {
-        Optional<Wallet> optionalSourceWallet = walletRepository.findById(transactionRequest.getSourceWallet());
-        Optional<Wallet> optionalTargetWallet = walletRepository.findById(transactionRequest.getTargetWallet());
+    public void transfer(TransferTransactionRequest transferTransactionRequest) {
+        Optional<Wallet> optionalSourceWallet = walletRepository.findById(transferTransactionRequest.getSourceWallet());
+        Optional<Wallet> optionalTargetWallet = walletRepository.findById(transferTransactionRequest.getTargetWallet());
 
         if(optionalSourceWallet.isEmpty() || optionalTargetWallet.isEmpty()) {
             throw new RuntimeException("At least one wallet is not valid.");
@@ -76,28 +76,28 @@ public class TransactionService {
         Wallet sourceWallet = optionalSourceWallet.get();
         Wallet targetWallet = optionalTargetWallet.get();
 
-        if(sourceWallet.getBalance() < transactionRequest.getAmount()) {
+        if(sourceWallet.getBalance() < transferTransactionRequest.getAmount()) {
             throw new RuntimeException("Source user does not have balance to perform this operation");
         }
 
-        if(transactionRequest.getAmount() <= 0) {
+        if(transferTransactionRequest.getAmount() <= 0) {
             throw new RuntimeException("Amount is invalid.");
         }
 
-        sourceWallet.setBalance(sourceWallet.getBalance() - transactionRequest.getAmount());
-        targetWallet.setBalance(targetWallet.getBalance() + transactionRequest.getAmount());
+        sourceWallet.setBalance(sourceWallet.getBalance() - transferTransactionRequest.getAmount());
+        targetWallet.setBalance(targetWallet.getBalance() + transferTransactionRequest.getAmount());
 
         Transaction transaction = Transaction.builder()
                         .transactionType(TransactionType.TRANSFER)
                         .timestamp(new Date())
-                        .amount(transactionRequest.getAmount())
-                        .walletId(transactionRequest.getSourceWallet())
-                        .targetWallet(transactionRequest.getTargetWallet())
+                        .amount(transferTransactionRequest.getAmount())
+                        .walletId(transferTransactionRequest.getSourceWallet())
+                        .targetWallet(transferTransactionRequest.getTargetWallet())
                         .build();
 
         sourceWallet.getTransactions().add(transaction);
-
         transactionRepository.save(transaction);
+
         walletRepository.save(sourceWallet);
         walletRepository.save(targetWallet);
     }

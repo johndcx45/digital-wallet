@@ -3,13 +3,11 @@ package com.challenge.wallet.service;
 import com.challenge.wallet.domain.wallet.Wallet;
 import com.challenge.wallet.dto.wallet.WalletCreateRequest;
 import com.challenge.wallet.dto.wallet.WalletCreatedResponse;
-import com.challenge.wallet.mapper.WalletMapper;
 import com.challenge.wallet.repository.WalletRepository;
 import com.challenge.wallet.util.Constants;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,13 +23,11 @@ import java.util.UUID;
 public class WalletService {
     private WalletRepository walletRepository;
     private KafkaTemplate<String, Object> kafkaTemplate;
-    private WalletMapper walletMapper;
     private ObjectMapper objectMapper;
 
     public WalletService(WalletRepository walletRepository, KafkaTemplate<String, Object> kafkaTemplate) {
         this.walletRepository = walletRepository;
         this.kafkaTemplate = kafkaTemplate;
-        this.walletMapper = Mappers.getMapper(WalletMapper.class);
         this.objectMapper = new ObjectMapper();
     }
 

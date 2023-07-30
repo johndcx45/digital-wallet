@@ -22,12 +22,3 @@ spring:
       bootstrap-servers: 'host.docker.internal:9092'
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-logging:
-  level:
-    com.challenge.wallet.client:
-      UserClient: DEBUG
-feign:
-  client:
-    config:
-      default:
-        loggerLevel: full

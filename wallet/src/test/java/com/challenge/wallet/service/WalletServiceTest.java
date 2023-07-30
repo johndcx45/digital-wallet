@@ -108,6 +108,5 @@ class WalletServiceTest {
 
         verify(walletRepository, times(1)).findById(walletId);
         Assertions.assertThat(optional.isPresent()).isEqualTo(true);
-
     }
 }
