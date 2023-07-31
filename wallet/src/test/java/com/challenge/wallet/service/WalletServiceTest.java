@@ -3,6 +3,7 @@ package com.challenge.wallet.service;
 import com.challenge.wallet.domain.wallet.Wallet;
 import com.challenge.wallet.dto.wallet.WalletCreateRequest;
 import com.challenge.wallet.repository.WalletRepository;
+import com.challenge.wallet.service.impl.WalletServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ class WalletServiceTest {
     @BeforeEach
     void setup() {
         kafkaTemplate = mock(KafkaTemplate.class);
-        walletService = new WalletService(walletRepository, kafkaTemplate);
+        walletService = new WalletServiceImpl(walletRepository, kafkaTemplate);
         walletId = UUID.fromString("2a409788-1eb0-4ad9-bbc2-b512c25dce2f");
         userId = UUID.fromString("80648b2f-394c-42db-b554-9324a9db9cf7");
         wallet = Wallet.builder()

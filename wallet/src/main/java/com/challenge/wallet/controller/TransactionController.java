@@ -41,7 +41,7 @@ public class TransactionController {
         return new ResponseEntity(HttpStatus.OK);
     }
 
-    @GetMapping("/bill")
+    @PostMapping("/bill")
     public ResponseEntity payBill(@RequestBody BillPaymentTransactionRequest billPaymentTransactionRequest) {
         transactionService.payBill(billPaymentTransactionRequest);
 

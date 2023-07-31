@@ -3,14 +3,12 @@ package com.challenge.user.service.impl;
 import com.challenge.user.domain.User;
 import com.challenge.user.dto.CreateUserRequest;
 import com.challenge.user.dto.WalletCreatedResponse;
-import com.challenge.user.mapper.UserMapper;
 import com.challenge.user.repository.UserRepository;
 import com.challenge.user.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.mapstruct.factory.Mappers;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -26,13 +24,11 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
-    private UserMapper userMapper;
     private KafkaTemplate<String, Object> kafkaTemplate;
     private ObjectMapper objectMapper;
 
     public UserServiceImpl(UserRepository userRepository, KafkaTemplate<String, Object> kafkaTemplate) {
         this.userRepository = userRepository;
-        this.userMapper = Mappers.getMapper(UserMapper.class);
         this.objectMapper = new ObjectMapper();
         this.kafkaTemplate = kafkaTemplate;
     }
@@ -55,15 +51,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public User createUser(CreateUserRequest createUserRequest) {
-        User userMapped = userMapper.createUserRequestToUser(createUserRequest);
 
         User user = User.builder()
                 .createdAt(new Date())
-                .userId(userMapped.getUserId())
-                .firstName(userMapped.getFirstName())
-                .lastName(userMapped.getLastName())
-                .socialSecurityNumber(userMapped.getSocialSecurityNumber())
-                .username(userMapped.getUsername())
+                .firstName(createUserRequest.getFirstName())
+                .lastName(createUserRequest.getLastName())
+                .socialSecurityNumber(createUserRequest.getSocialSecurityNumber())
+                .username(createUserRequest.getUsername())
                 .build();
 
         return userRepository.save(user);

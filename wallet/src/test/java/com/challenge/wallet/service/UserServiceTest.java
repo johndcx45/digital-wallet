@@ -2,6 +2,7 @@ package com.challenge.wallet.service;
 
 import com.challenge.wallet.client.UserClient;
 import com.challenge.wallet.dto.wallet.UserResponse;
+import com.challenge.wallet.service.impl.UserServiceImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.assertj.core.api.Assertions;
@@ -31,7 +32,7 @@ class UserServiceTest {
 
     @BeforeEach
     void setup() {
-        userService = new UserService(userClient);
+        userService = new UserServiceImpl(userClient);
         userId = UUID.fromString("44ae5fe1-bf3f-49bb-8c84-965db4552a57");
         walletId = UUID.fromString("0abd1738-6bee-4ae4-a32c-41c1bd3bdd82");
         userResponse = new UserResponse(

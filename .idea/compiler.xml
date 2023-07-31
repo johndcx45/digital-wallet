@@ -7,6 +7,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
+        <module name="wallet" />
       </profile>
       <profile name="Annotation profile for wallet" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
@@ -16,7 +17,6 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.24/lombok-1.18.24.jar" />
         </processorPath>
         <module name="user" />
-        <module name="wallet" />
       </profile>
     </annotationProcessing>
   </component>

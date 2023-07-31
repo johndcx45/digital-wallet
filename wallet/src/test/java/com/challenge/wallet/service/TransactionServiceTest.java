@@ -8,6 +8,7 @@ import com.challenge.wallet.dto.transaction.TransferTransactionRequest;
 import com.challenge.wallet.dto.transaction.WithdrawTransactionRequest;
 import com.challenge.wallet.repository.TransactionRepository;
 import com.challenge.wallet.repository.WalletRepository;
+import com.challenge.wallet.service.impl.TransactionServiceImpl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,7 @@ class TransactionServiceTest {
         walletId = UUID.fromString("2a409788-1eb0-4ad9-bbc2-b512c25dce2f");
         targetWalletId = UUID.fromString("c46fe5eb-0ea6-4a83-825f-fc7451cce2a8");
         userId = UUID.fromString("80648b2f-394c-42db-b554-9324a9db9cf7");
-        transactionService = new TransactionService(userService, walletRepository,
+        transactionService = new TransactionServiceImpl(userService, walletRepository,
                 transactionRepository);
         depositTransactionRequest = new DepositTransactionRequest(
                 amount,
