@@ -2,6 +2,7 @@ package com.challenge.user.service;
 
 import com.challenge.user.domain.User;
 import com.challenge.user.dto.CreateUserRequest;
+import com.challenge.user.dto.UpdateUserRequest;
 import com.challenge.user.repository.UserRepository;
 import com.challenge.user.service.impl.UserServiceImpl;
 import org.assertj.core.api.Assertions;
@@ -28,6 +29,7 @@ class UserServiceImplTest {
     @Mock
     private KafkaTemplate<String, Object> kafkaTemplate;
     private CreateUserRequest createUserRequest;
+    private UpdateUserRequest updateUserRequest;
     private User firstUser;
     private User secondUser;
     private UUID firstUserId;
@@ -38,7 +40,6 @@ class UserServiceImplTest {
         userService = new UserServiceImpl(userRepository, kafkaTemplate);
         firstUserId = UUID.fromString("2a409788-1eb0-4ad9-bbc2-b512c25dce2f");
         secondUserId = UUID.fromString("80648b2f-394c-42db-b554-9324a9db9cf7");
-
         firstUser = User.builder()
                 .userId(firstUserId)
                 .firstName("First Name")
@@ -57,6 +58,13 @@ class UserServiceImplTest {
                 .build();
 
         createUserRequest = new CreateUserRequest(
+                "username-1",
+                "First Name",
+                "Last Name",
+                "12345678900"
+        );
+        updateUserRequest = new UpdateUserRequest(
+                firstUserId,
                 "username-1",
                 "First Name",
                 "Last Name",
@@ -172,5 +180,24 @@ class UserServiceImplTest {
     void givenValidId_whenDeleteById_thenDeleteById() {
         userService.deleteById(firstUserId);
         verify(userRepository, times(1)).deleteById(firstUserId);
+    }
+
+    @Test
+    void givenValidUpdateUserRequest_whenUpdate_thenUpdateSuccessfully() {
+        when(userRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.of(firstUser));
+        when(userRepository.save(Mockito.any(User.class))).thenReturn(firstUser);
+        User user = userService.updateUser(updateUserRequest);
+
+        Assertions.assertThat(user.getUserId()).isEqualTo(updateUserRequest.getUserId());
+        Assertions.assertThat(user.getSocialSecurityNumber()).isEqualTo(updateUserRequest.getSocialSecurityNumber());
+    }
+
+    @Test
+    void givenInvalidUserId_whenUpdate_thenFailOnUpdate() {
+        when(userRepository.findById(Mockito.any(UUID.class))).thenReturn(Optional.empty());
+
+        User user = userService.updateUser(updateUserRequest);
+
+        Assertions.assertThat(user).isEqualTo(null);
     }
 }

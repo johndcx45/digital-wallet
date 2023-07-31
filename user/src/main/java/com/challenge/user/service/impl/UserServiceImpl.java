@@ -2,6 +2,7 @@ package com.challenge.user.service.impl;
 
 import com.challenge.user.domain.User;
 import com.challenge.user.dto.CreateUserRequest;
+import com.challenge.user.dto.UpdateUserRequest;
 import com.challenge.user.dto.WalletCreatedResponse;
 import com.challenge.user.repository.UserRepository;
 import com.challenge.user.service.UserService;
@@ -92,6 +93,26 @@ public class UserServiceImpl implements UserService {
             log.error("Error in processing the JSON message: " + e);
             throw new RuntimeException(e);
         }
+    }
+
+    public User updateUser(UpdateUserRequest updateUserRequest) {
+        Optional<User> optional = userRepository.findById(updateUserRequest.getUserId());
+
+        if(optional.isEmpty()) {
+            return null;
+        }
+
+        User userUpdated = User.builder()
+                .userId(optional.get().getUserId())
+                .firstName(updateUserRequest.getFirstName())
+                .lastName(updateUserRequest.getLastName())
+                .username(updateUserRequest.getUsername())
+                .socialSecurityNumber(updateUserRequest.getSocialSecurityNumber())
+                .createdAt(optional.get().getCreatedAt())
+                .walletId(optional.get().getWalletId())
+                .build();
+
+        return userRepository.save(userUpdated);
     }
 
     public void deleteById(UUID id) {

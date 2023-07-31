@@ -2,6 +2,7 @@ package com.challenge.user.controller;
 
 import com.challenge.user.domain.User;
 import com.challenge.user.dto.CreateUserRequest;
+import com.challenge.user.dto.UpdateUserRequest;
 import com.challenge.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -55,6 +56,17 @@ public class UserController {
         }
 
         return new ResponseEntity(user, HttpStatus.CREATED);
+    }
+
+    @PutMapping
+    public ResponseEntity<User> update(@RequestBody UpdateUserRequest updateUserRequest) {
+        User user = userService.updateUser(updateUserRequest);
+
+        if(user == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
