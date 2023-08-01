@@ -166,7 +166,7 @@ requsição com o usuário à ser alterado, no seguinte formato:
     - WITHDRAW - Saque.
     - DEPOSIT - Depósito.
     - TRANSFER - Transferência
-
+- O serviço de carteira executa na máquina local e na porta `8080`, basta enviar as requisições para o seguinte endereço `http://localhost:8080`,e ele contém os seguintes endpoints:
 ## API de Carteira
 ### POST /wallets - Cria uma carteira digital com base no corpo da requisição
 - Status HTTP OK, foi criado com sucesso, caso contrário, HTTP Bad Request.
