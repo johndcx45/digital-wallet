@@ -191,7 +191,7 @@ requsição com o usuário à ser alterado, no seguinte formato:
 - Status HTTP OK, foi achado com sucesso, caso contrário, HTTP Bad Request.
 - Este endpoint provê a busca de carteiras com paginação e espera dois parâmetros de requisição: page e size.
 - Ele não requer nenhum campo na corpo da requisição. Somente dois parâmetros, page e size.
-- A resposta dessa requisição é no seguinte formato para uma requisição `GET http://localhost:8081/wallets?page=0&size=1`:
+- A resposta dessa requisição é no seguinte formato para uma requisição `GET http://localhost:8080/wallets?page=0&size=1`:
   - ```json
       [
         {
@@ -207,7 +207,7 @@ requsição com o usuário à ser alterado, no seguinte formato:
 - Status HTTP OK, foi achado com sucesso, caso contrário, HTTP Not Found.
 - Este endpoint provê a busca de carteiras por identificador e espera um parâmetro, o identificador da carteira a ser buscada.
 - Ele não requer nenhum campo no corpo da requisição.
-- A resposta dessa requisição é no seguinte formato para uma requisição `GET http://localhost:8081/wallets/961337fd-8f39-4eb9-a421-9c36eaa9a5ef`:
+- A resposta dessa requisição é no seguinte formato para uma requisição `GET http://localhost:8080/wallets/961337fd-8f39-4eb9-a421-9c36eaa9a5ef`:
   - ```json
       {
         "walletId": "d8fa4f91-f1c8-4cb7-9cc5-22a017fcf6df",
